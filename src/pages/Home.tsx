@@ -1,7 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import ReCAPTCHA from "react-google-recaptcha";
 import Button from "../components/Button";
 import Card from "../components/Card";
 import TestimonialCard from "../components/TestimonialCard";
+import Logo from "../assets/logo.png";
 
 import "../styles/header.css";
 import "../styles/utility.css";
@@ -10,38 +12,49 @@ import "../styles/solution.css";
 import "../styles/testimonials.css";
 import "../styles/pricing.css";
 
-const Logo = "/src/assets/logo.png";
 
-const Menu = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='%23C9A84C' stroke-width='2'%3E%3Cline x1='3' y1='6' x2='21' y2='6'/%3E%3Cline x1='3' y1='12' x2='21' y2='12'/%3E%3Cline x1='3' y1='18' x2='21' y2='18'/%3E%3C/svg%3E";
-const Close = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='%23C9A84C' stroke-width='2'%3E%3Cline x1='18' y1='6' x2='6' y2='18'/%3E%3Cline x1='6' y1='6' x2='18' y2='18'/%3E%3C/svg%3E";
 
-const IconCosmeticos = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' fill='none' stroke='%23C9A84C' stroke-width='1.5' viewBox='0 0 24 24'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z'/%3E%3Cpath d='M8 14s1.5 2 4 2 4-2 4-2'/%3E%3Cline x1='9' y1='9' x2='9.01' y2='9'/%3E%3Cline x1='15' y1='9' x2='15.01' y2='9'/%3E%3C/svg%3E";
-const IconAcessorios = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' fill='none' stroke='%23C9A84C' stroke-width='1.5' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 20c0-4 3.6-7 8-7s8 3 8 7'/%3E%3C/svg%3E";
-const IconPresentes = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' fill='none' stroke='%23C9A84C' stroke-width='1.5' viewBox='0 0 24 24'%3E%3Crect x='3' y='8' width='18' height='13' rx='1'/%3E%3Cpath d='M21 8H3V6a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v2z'/%3E%3Cline x1='12' y1='5' x2='12' y2='21'/%3E%3Cpath d='M12 5C12 5 9 2 7 3s-1 3 2 3'/%3E%3Cpath d='M12 5c0 0 3-3 5-2s1 3-2 3'/%3E%3C/svg%3E";
-const IconCheck = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='%23C9A84C' stroke-width='2.5' viewBox='0 0 24 24'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E";
+const Menu =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='%23C9A84C' stroke-width='2'%3E%3Cline x1='3' y1='6' x2='21' y2='6'/%3E%3Cline x1='3' y1='12' x2='21' y2='12'/%3E%3Cline x1='3' y1='18' x2='21' y2='18'/%3E%3C/svg%3E";
+const Close =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='%23C9A84C' stroke-width='2'%3E%3Cline x1='18' y1='6' x2='6' y2='18'/%3E%3Cline x1='6' y1='6' x2='18' y2='18'/%3E%3C/svg%3E";
+
+const IconCosmeticos =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' fill='none' stroke='%23C9A84C' stroke-width='1.5' viewBox='0 0 24 24'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z'/%3E%3Cpath d='M8 14s1.5 2 4 2 4-2 4-2'/%3E%3Cline x1='9' y1='9' x2='9.01' y2='9'/%3E%3Cline x1='15' y1='9' x2='15.01' y2='9'/%3E%3C/svg%3E";
+const IconAcessorios =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' fill='none' stroke='%23C9A84C' stroke-width='1.5' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 20c0-4 3.6-7 8-7s8 3 8 7'/%3E%3C/svg%3E";
+const IconPresentes =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' fill='none' stroke='%23C9A84C' stroke-width='1.5' viewBox='0 0 24 24'%3E%3Crect x='3' y='8' width='18' height='13' rx='1'/%3E%3Cpath d='M21 8H3V6a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v2z'/%3E%3Cline x1='12' y1='5' x2='12' y2='21'/%3E%3Cpath d='M12 5C12 5 9 2 7 3s-1 3 2 3'/%3E%3Cpath d='M12 5c0 0 3-3 5-2s1 3-2 3'/%3E%3C/svg%3E";
+const IconCheck =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='%23C9A84C' stroke-width='2.5' viewBox='0 0 24 24'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E";
 
 const ProfileOne = "https://placehold.co/130x130/F2EDE4/3a3028?text=M";
-const ProfileTwo  = "https://placehold.co/130x130/F2EDE4/3a3028?text=A";
+const ProfileTwo = "https://placehold.co/130x130/F2EDE4/3a3028?text=A";
 const ProfileThree = "https://placehold.co/130x130/F2EDE4/3a3028?text=C";
+
+const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
 const testimonials = [
   {
     profileImage: ProfileOne,
-    testimony: "Os cosméticos da Aura Collection são simplesmente incríveis! A qualidade é impecável e a embalagem chegou lindamente embrulhada. Super recomendo!",
+    testimony:
+      "Os cosméticos da Aura Collection são simplesmente incríveis! A qualidade é impecável e a embalagem chegou lindamente embrulhada. Super recomendo!",
     stars: 5,
     name: "Mariana Souza",
     role: "Cliente desde 2023",
   },
   {
     profileImage: ProfileTwo,
-    testimony: "Comprei um kit presente para minha mãe e ela amou cada detalhe. Entrega rápida mesmo vindo de Nova Aurora para cá. Voltarei a comprar com certeza!",
+    testimony:
+      "Comprei um kit presente para minha mãe e ela amou cada detalhe. Entrega rápida mesmo vindo de Nova Aurora para cá. Voltarei a comprar com certeza!",
     stars: 5,
     name: "Andressa Lima",
     role: "Cliente fiel",
   },
   {
     profileImage: ProfileThree,
-    testimony: "Os acessórios são de ótima qualidade e o atendimento é excelente. Fiz meu pedido e em poucos dias já estava em mãos. Nota 10!",
+    testimony:
+      "Os acessórios são de ótima qualidade e o atendimento é excelente. Fiz meu pedido e em poucos dias já estava em mãos. Nota 10!",
     stars: 4,
     name: "Carlos Mendes",
     role: "Comprador recorrente",
@@ -52,7 +65,11 @@ export default function Home() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [contactEmail, setContactEmail] = useState("");
   const [contactMessage, setContactMessage] = useState("");
-  const [emailStatus, setEmailStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+  const [emailStatus, setEmailStatus] = useState<
+    "idle" | "sending" | "success" | "error"
+  >("idle");
+  const [isChallengeCompleted, setChallengeCompleted] = useState(false);
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   useEffect(() => {
     const html = document.querySelector("html");
@@ -61,8 +78,17 @@ export default function Home() {
     }
   }, [showMobileMenu]);
 
+  function handleCompleteChallenge(token: string | null) {
+    if (!token) {
+      setChallengeCompleted(false);
+      return;
+    }
+    setChallengeCompleted(true);
+  }
+
   async function handleSendEmail() {
-    if (!contactEmail.trim() || !contactMessage.trim()) return;
+    if (!contactEmail.trim() || !contactMessage.trim() || !isChallengeCompleted)
+      return;
     setEmailStatus("sending");
     try {
       const response = await fetch("/api/send-email", {
@@ -74,6 +100,8 @@ export default function Home() {
       setEmailStatus("success");
       setContactEmail("");
       setContactMessage("");
+      setChallengeCompleted(false);
+      recaptchaRef.current?.reset();
     } catch {
       setEmailStatus("error");
     }
@@ -83,21 +111,39 @@ export default function Home() {
     <>
       <header className="container py-sm">
         <nav className="flex items-center justify-between">
-          <img src={Logo} alt="Logo Aura Collection" width={160} height={70} style={{ objectFit: "contain" }} />
+          <img
+            src={Logo}
+            alt="Logo Aura Collection"
+            width={160}
+            height={70}
+            style={{ objectFit: "contain" }}
+          />
 
           <div className="desktop-only">
             <ul className="flex gap-1">
-              <li><a href="#">Home</a></li>
-              <li><a href="#solution">Soluções</a></li>
-              <li><a href="#testimonials">Depoimentos</a></li>
-              <li><a href="#pricing">Preços</a></li>
-              <li><a href="#contact">Contato</a></li>
+              <li>
+                <a href="#">Home</a>
+              </li>
+              <li>
+                <a href="#solution">Soluções</a>
+              </li>
+              <li>
+                <a href="#testimonials">Depoimentos</a>
+              </li>
+              <li>
+                <a href="#pricing">Preços</a>
+              </li>
+              <li>
+                <a href="#contact">Contato</a>
+              </li>
             </ul>
           </div>
 
           <div className="desktop-only">
             <div className="flex items-center">
-              <a className="reverse-color ml-lg" href="">Login</a>
+              <a className="reverse-color ml-lg" href="">
+                Login
+              </a>
               <Button text="Cadastre-se" />
             </div>
           </div>
@@ -107,20 +153,66 @@ export default function Home() {
               <div className="mobile-menu-content">
                 <div className="container flex">
                   <ul>
-                    <li><a onClick={() => setShowMobileMenu(false)} href="#">Home</a></li>
-                    <li><a onClick={() => setShowMobileMenu(false)} href="#solution">Soluções</a></li>
-                    <li><a onClick={() => setShowMobileMenu(false)} href="#testimonials">Depoimentos</a></li>
-                    <li><a onClick={() => setShowMobileMenu(false)} href="#pricing">Preços</a></li>
-                    <li><a onClick={() => setShowMobileMenu(false)} href="#contact">Contato</a></li>
-                    <li><a className="reverse-color" onClick={() => setShowMobileMenu(false)} href="#">Login</a></li>
+                    <li>
+                      <a onClick={() => setShowMobileMenu(false)} href="#">
+                        Home
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        onClick={() => setShowMobileMenu(false)}
+                        href="#solution"
+                      >
+                        Soluções
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        onClick={() => setShowMobileMenu(false)}
+                        href="#testimonials"
+                      >
+                        Depoimentos
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        onClick={() => setShowMobileMenu(false)}
+                        href="#pricing"
+                      >
+                        Preços
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        onClick={() => setShowMobileMenu(false)}
+                        href="#contact"
+                      >
+                        Contato
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        className="reverse-color"
+                        onClick={() => setShowMobileMenu(false)}
+                        href="#"
+                      >
+                        Login
+                      </a>
+                    </li>
                   </ul>
-                  <span onClick={() => setShowMobileMenu(false)} className="btn-wrapper">
+                  <span
+                    onClick={() => setShowMobileMenu(false)}
+                    className="btn-wrapper"
+                  >
                     <img src={Close} alt="fechar menu" width={24} height={24} />
                   </span>
                 </div>
               </div>
             ) : (
-              <span onClick={() => setShowMobileMenu(true)} className="btn-wrapper">
+              <span
+                onClick={() => setShowMobileMenu(true)}
+                className="btn-wrapper"
+              >
                 <img src={Menu} alt="abrir menu" width={24} height={24} />
               </span>
             )}
@@ -133,11 +225,13 @@ export default function Home() {
           <p className="desktop-only gold-tag">Nova Aurora · Paraná · Brasil</p>
           <h1>Beleza, estilo e presentes que encantam!</h1>
           <p>
-            Cosméticos, acessórios e presentes selecionados com amor em Nova Aurora — PR.
-            Enviamos para todo o Brasil com cuidado e agilidade.
+            Cosméticos, acessórios e presentes selecionados com amor em Nova
+            Aurora — PR. Enviamos para todo o Brasil com cuidado e agilidade.
           </p>
           <div className="flex gap-1">
-            <span><Button text="Comprar agora" /></span>
+            <span>
+              <Button text="Comprar agora" />
+            </span>
             <span className="desktop-only">
               <Button text="Ver coleção" secondary />
             </span>
@@ -189,8 +283,9 @@ export default function Home() {
             <h2>Cada cliente importa!</h2>
           </span>
           <p>
-            Clientes de todo o Brasil já descobriram a experiência Aura Collection.
-            Veja o que estão dizendo sobre nossos produtos e atendimento.
+            Clientes de todo o Brasil já descobriram a experiência Aura
+            Collection. Veja o que estão dizendo sobre nossos produtos e
+            atendimento.
           </p>
         </header>
 
@@ -288,47 +383,144 @@ export default function Home() {
         </section>
       </section>
 
-      <footer id="contact" style={{
-        background: "var(--secondary-color)",
-        color: "var(--light-text-color)",
-        textAlign: "center",
-        padding: "2.5rem",
-        marginTop: "4rem"
-      }}>
-        <p style={{ color: "var(--primary-color)", fontWeight: "bold", letterSpacing: "0.1em", fontSize: "1.1rem" }}>
+      <footer
+        id="contact"
+        style={{
+          background: "var(--secondary-color)",
+          color: "var(--light-text-color)",
+          textAlign: "center",
+          padding: "2.5rem",
+          marginTop: "4rem",
+        }}
+      >
+        <p
+          style={{
+            color: "var(--primary-color)",
+            fontWeight: "bold",
+            letterSpacing: "0.1em",
+            fontSize: "1.1rem",
+          }}
+        >
           AURA COLLECTION
         </p>
-        <p style={{ color: "#c4b49a", marginTop: "0.5rem", fontSize: "0.875rem" }}>
+        <p
+          style={{
+            color: "#c4b49a",
+            marginTop: "0.5rem",
+            fontSize: "0.875rem",
+          }}
+        >
           Nova Aurora · Paraná · Brasil
         </p>
-        <p style={{ color: "#c4b49a", marginTop: "0.25rem", fontSize: "0.875rem" }}>
+        <p
+          style={{
+            color: "#c4b49a",
+            marginTop: "0.25rem",
+            fontSize: "0.875rem",
+          }}
+        >
           contato@auracollection.com.br
         </p>
+        <p
+          style={{
+            color: "#c4b49a",
+            marginTop: "0.25rem",
+            fontSize: "0.875rem",
+          }}
+        >
+          Av São Luiz, 870 - Lot. São José
+        </p>
+        <p
+          style={{
+            color: "#c4b49a",
+            marginTop: "0.25rem",
+            fontSize: "0.875rem",
+          }}
+        >
+          (45) 99862-8001 · @auracollectio
+        </p>
 
-        <div style={{ marginTop: "2rem", display: "flex", flexDirection: "column", gap: "1rem", maxWidth: "400px", margin: "2rem auto 0" }}>
-          <p style={{ color: "var(--primary-color)", fontWeight: "bold", letterSpacing: "0.08em" }}>FALE CONOSCO</p>
+        <div
+          style={{
+            marginTop: "2rem",
+            display: "flex",
+            flexDirection: "column",
+            gap: "1rem",
+            maxWidth: "400px",
+            margin: "2rem auto 0",
+            alignItems: "center",
+          }}
+        >
+          <p
+            style={{
+              color: "var(--primary-color)",
+              fontWeight: "bold",
+              letterSpacing: "0.08em",
+            }}
+          >
+            FALE CONOSCO
+          </p>
           <input
             type="email"
             placeholder="Seu e-mail"
             value={contactEmail}
             onChange={(e) => setContactEmail(e.target.value)}
-            style={{ padding: "0.75rem 1rem", borderRadius: "0.25rem", border: "1px solid #c4b49a", background: "transparent", color: "var(--light-text-color)", outline: "none" }}
+            style={{
+              width: "100%",
+              padding: "0.75rem 1rem",
+              borderRadius: "0.25rem",
+              border: "1px solid #c4b49a",
+              background: "transparent",
+              color: "var(--light-text-color)",
+              outline: "none",
+            }}
           />
           <textarea
             placeholder="Sua mensagem"
             value={contactMessage}
             onChange={(e) => setContactMessage(e.target.value)}
             rows={4}
-            style={{ padding: "0.75rem 1rem", borderRadius: "0.25rem", border: "1px solid #c4b49a", background: "transparent", color: "var(--light-text-color)", outline: "none", resize: "none" }}
+            style={{
+              width: "100%",
+              padding: "0.75rem 1rem",
+              borderRadius: "0.25rem",
+              border: "1px solid #c4b49a",
+              background: "transparent",
+              color: "var(--light-text-color)",
+              outline: "none",
+              resize: "none",
+            }}
+          />
+          <ReCAPTCHA
+            ref={recaptchaRef}
+            sitekey={RECAPTCHA_SITE_KEY}
+            onChange={handleCompleteChallenge}
           />
           <button
             onClick={handleSendEmail}
-            style={{ padding: "0.825rem", background: "var(--primary-color)", color: "var(--secondary-color)", fontWeight: "bold", border: "none", borderRadius: "0.25rem", cursor: "pointer", letterSpacing: "0.08em" }}
+            disabled={!isChallengeCompleted || emailStatus === "sending"}
+            style={{
+              width: "100%",
+              padding: "0.825rem",
+              background: isChallengeCompleted
+                ? "var(--primary-color)"
+                : "#8a8170",
+              color: "var(--secondary-color)",
+              fontWeight: "bold",
+              border: "none",
+              borderRadius: "0.25rem",
+              cursor: isChallengeCompleted ? "pointer" : "not-allowed",
+              letterSpacing: "0.08em",
+            }}
           >
             {emailStatus === "sending" ? "ENVIANDO..." : "ENVIAR MENSAGEM"}
           </button>
-          {emailStatus === "success" && <p style={{ color: "#90ee90" }}>Mensagem enviada com sucesso!</p>}
-          {emailStatus === "error" && <p style={{ color: "#ff6b6b" }}>Erro ao enviar. Tente novamente.</p>}
+          {emailStatus === "success" && (
+            <p style={{ color: "#90ee90" }}>Mensagem enviada com sucesso!</p>
+          )}
+          {emailStatus === "error" && (
+            <p style={{ color: "#ff6b6b" }}>Erro ao enviar. Tente novamente.</p>
+          )}
         </div>
       </footer>
     </>
