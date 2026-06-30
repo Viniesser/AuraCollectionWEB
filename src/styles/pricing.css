@@ -1,0 +1,101 @@
+#pricing {
+  display: flex;
+  flex-direction: column;
+  padding-block: 4rem;
+  gap: 2rem;
+  background: var(--light-gray);
+}
+
+#pricing header {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+#pricing header :first-child {
+  color: var(--primary-color);
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: var(--fs-sm);
+}
+
+.pricing-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-self: center;
+  height: min-content;
+  padding: 1.5rem 1.5rem 3rem 1.5rem;
+  background-color: var(--bg-color);
+  border-radius: 0.5rem;
+  box-shadow: rgba(58, 48, 40, 0.15) 0px 12px 24px;
+}
+
+.hr {
+  height: 1.5px;
+  background-color: var(--primary-color);
+  margin-block: 0.725rem;
+}
+
+.features {
+  display: flex;
+  gap: 1rem;
+}
+
+.plan {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.plan h3 { color: var(--secondary-color); }
+
+.premium {
+  border: solid 0.2rem var(--primary-color);
+  padding: 0rem 1.5rem 3rem 1.5rem;
+}
+
+.premium .plan > h3 {
+  color: var(--primary-color);
+}
+
+.bonus {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--secondary-color);
+  width: 65%;
+  height: 2.5rem;
+  align-self: center;
+  border-bottom-left-radius: 1.5rem;
+  border-bottom-right-radius: 1.5rem;
+}
+
+.bonus p {
+  font-size: 12px;
+  font-weight: var(--fw-md);
+  color: var(--primary-color);
+  letter-spacing: 0.06em;
+}
+
+.price {
+  display: flex;
+  align-items: end;
+}
+
+.price p {
+  margin-left: 8px;
+  padding-bottom: 4px;
+  color: var(--second-text-color);
+}
+
+@media (width >= 1280px) {
+  #pricing {
+    gap: 5rem;
+    padding-block: 5rem;
+  }
+
+  h3 { font-size: 1.25rem; }
+}
