@@ -14,23 +14,15 @@ const corsHeaders = (origin: string) => ({
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 });
 
-const handler: Handler = async (event: HandlerEvent) => {
+export const handler: Handler = async (event: HandlerEvent) => {
   const origin = event.headers["origin"] ?? "";
 
   if (event.httpMethod === "OPTIONS") {
-    return {
-      statusCode: 204,
-      headers: corsHeaders(origin),
-      body: "",
-    };
+    return { statusCode: 204, headers: corsHeaders(origin), body: "" };
   }
 
   if (event.httpMethod !== "POST") {
-    return {
-      statusCode: 405,
-      headers: corsHeaders(origin),
-      body: JSON.stringify({ error: "Método não permitido." }),
-    };
+    return { statusCode: 405, headers: corsHeaders(origin), body: JSON.stringify({ error: "Método não permitido." }) };
   }
 
   let payload: ContactPayload;
@@ -38,30 +30,18 @@ const handler: Handler = async (event: HandlerEvent) => {
   try {
     payload = JSON.parse(event.body ?? "{}");
   } catch {
-    return {
-      statusCode: 400,
-      headers: corsHeaders(origin),
-      body: JSON.stringify({ error: "Body inválido." }),
-    };
+    return { statusCode: 400, headers: corsHeaders(origin), body: JSON.stringify({ error: "Body inválido." }) };
   }
 
   const { email, message } = payload;
 
   if (!email?.trim() || !message?.trim()) {
-    return {
-      statusCode: 422,
-      headers: corsHeaders(origin),
-      body: JSON.stringify({ error: "Campos obrigatórios: email, message." }),
-    };
+    return { statusCode: 422, headers: corsHeaders(origin), body: JSON.stringify({ error: "Campos obrigatórios: email, message." }) };
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
-    return {
-      statusCode: 422,
-      headers: corsHeaders(origin),
-      body: JSON.stringify({ error: "E-mail inválido." }),
-    };
+    return { statusCode: 422, headers: corsHeaders(origin), body: JSON.stringify({ error: "E-mail inválido." }) };
   }
 
   const transporter = nodemailer.createTransport({
@@ -78,30 +58,14 @@ const handler: Handler = async (event: HandlerEvent) => {
     await transporter.sendMail({
       from: `<${process.env.SMTP_USER}>`,
       replyTo: email,
-      to: process.env.CONTACT_EMAIL,
+      to: `${process.env.CONTACT_EMAIL}, ${email}`,
       subject: "[Aura Collection] Nova mensagem Landing Page",
       text: message,
-      html: `
-        <h2>Nova mensagem de contato</h2>
-        <p><strong>E-mail:</strong> ${email}</p>
-        <p><strong>Mensagem:</strong></p>
-        <p>${message.replace(/\n/g, "<br>")}</p>
-      `,
+      html: `<h2>Nova mensagem de contato</h2><p><strong>E-mail:</strong> ${email}</p><p><strong>Mensagem:</strong></p><p>${message.replace(/\n/g, "<br>")}</p>`,
     });
-
-    return {
-      statusCode: 200,
-      headers: corsHeaders(origin),
-      body: JSON.stringify({ message: "E-mail enviado com sucesso." }),
-    };
+    return { statusCode: 200, headers: corsHeaders(origin), body: JSON.stringify({ message: "E-mail enviado com sucesso." }) };
   } catch (error) {
     console.error("Erro ao enviar e-mail:", error);
-    return {
-      statusCode: 500,
-      headers: corsHeaders(origin),
-      body: JSON.stringify({ error: "Falha ao enviar o e-mail. Tente novamente mais tarde." }),
-    };
+    return { statusCode: 500, headers: corsHeaders(origin), body: JSON.stringify({ error: "Falha ao enviar o e-mail." }) };
   }
 };
-
-export { handler };
